@@ -42,6 +42,13 @@ class CustomUserAdmin(UserAdmin):
 
 @admin.register(models.VerificationCode)
 class VerificationCodeAdmin(admin.ModelAdmin):
-    list_display = ('code', 'user', 'is_used', 'created_at', 'expires_at')
+    list_display = ('code', 'user', 'is_used', 'type', 'created_at', 'expires_at')
     search_fields = ('code', 'user__email')
-    list_filter = ('is_used',)
+    list_filter = ('is_used', 'type')
+
+
+@admin.register(models.UserOnboarding)
+class UserOnboardingAdmin(admin.ModelAdmin):
+    list_display = ('user', 'created_at', 'updated_at')
+    search_fields = ('user__email',)
+    list_filter = ('created_at', 'updated_at')
