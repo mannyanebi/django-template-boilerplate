@@ -130,3 +130,4 @@ networks:
 volumes:
   postgres-data:
   django-static:
+  django-logs:
