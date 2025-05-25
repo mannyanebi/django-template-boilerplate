@@ -10,6 +10,7 @@ import socket
 from typing import TYPE_CHECKING
 
 from server.settings.components import config
+from server.settings.components.caches import CACHES
 from server.settings.components.common import DATABASES, INSTALLED_APPS, MIDDLEWARE
 from server.settings.components.common import (
     SPECTACULAR_SETTINGS as SPECTACULAR_SETTINGS_BASE,
@@ -183,3 +184,22 @@ SPECTACULAR_SETTINGS["SERVERS"] = [
 EMAIL_HOST = config("EMAIL_HOST", default="")
 EMAIL_PORT = 1025
 EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=False)
+
+# Caches
+
+# https://docs.djangoproject.com/en/4.2/topics/cache/
+
+# https://github.com/jazzband/django-redis
+
+
+CACHES = CACHES.copy()
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": config("REDIS_URL", default="redis://localhost:6379/0"),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+    },
+}

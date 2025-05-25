@@ -5,6 +5,7 @@ values are overridden.
 """
 
 from server.settings.components import config
+from server.settings.components.caches import CACHES
 from server.settings.components.common import (
     SPECTACULAR_SETTINGS as SPECTACULAR_SETTINGS_BASE,
 )
@@ -111,3 +112,22 @@ EMAIL_PORT = 1025
 EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=False)
 
 CORS_ALLOWED_ORIGIN_REGEXES = [r"^/api/.*$", config("DOMAIN_NAME", default="")]
+
+# Caches
+
+# https://docs.djangoproject.com/en/4.2/topics/cache/
+
+# https://github.com/jazzband/django-redis
+
+
+CACHES = CACHES.copy()
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": config("REDIS_URL", default="redis://localhost:6379/0"),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+    },
+}
