@@ -16,53 +16,79 @@ if TYPE_CHECKING:
     from django.http import HttpRequest, HttpResponse
 
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
+    "version": 1,
+    "disable_existing_loggers": False,
     # We use these formatters in our `'handlers'` configuration.
     # Probably, you won't need to modify these lines.
     # Unless, you know what you are doing.
-    'formatters': {
-        'json_formatter': {
-            '()': structlog.stdlib.ProcessorFormatter,
-            'processor': structlog.processors.JSONRenderer(),
+    "formatters": {
+        "json_formatter": {
+            "()": structlog.stdlib.ProcessorFormatter,
+            "processor": structlog.processors.JSONRenderer(),
         },
-        'console': {
-            '()': structlog.stdlib.ProcessorFormatter,
-            'processor': structlog.processors.KeyValueRenderer(
-                key_order=['timestamp', 'level', 'event', 'logger'],
+        "console": {
+            "()": structlog.stdlib.ProcessorFormatter,
+            "processor": structlog.processors.KeyValueRenderer(
+                key_order=["timestamp", "level", "event", "logger"],
             ),
-            'foreign_pre_chain': [
+            "foreign_pre_chain": [
                 structlog.stdlib.add_log_level,
                 structlog.stdlib.add_logger_name,
-                structlog.processors.TimeStamper(fmt='iso'),
+                structlog.processors.TimeStamper(fmt="iso"),
+            ],
+        },
+        "verbose": {
+            "()": structlog.stdlib.ProcessorFormatter,
+            "processor": structlog.dev.ConsoleRenderer(colors=True),
+            "foreign_pre_chain": [
+                structlog.stdlib.add_log_level,
+                structlog.stdlib.add_logger_name,
+                structlog.processors.TimeStamper(fmt="iso"),
+                # structlog.processors.format_exc_info,
             ],
         },
     },
     # You can easily swap `key/value` (default) output and `json` ones.
     # Use `'json_console'` if you need `json` logs.
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'console',
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "console",
         },
-        'json_console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'json_formatter',
+        "verbose_console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+        "json_console": {
+            "class": "logging.StreamHandler",
+            "formatter": "json_formatter",
+        },
+        "json_file": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "formatter": "json_formatter",
+            "filename": "logs/django-app.log",
+            "maxBytes": 10485760,  # 10MB
+            "backupCount": 5,
         },
     },
     # These loggers are required by our app:
     # - django is required when using `logger.getLogger('django')`
     # - security is required by `axes`
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': 'INFO',
-            'propagate': True,
+    "loggers": {
+        "django": {
+            "handlers": ["verbose_console"],
+            "level": "INFO",
+            "propagate": True,
         },
-        'security': {
-            'handlers': ['console'],
-            'level': 'ERROR',
-            'propagate': False,
+        "django.request": {
+            "handlers": ["verbose_console"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+        "security": {
+            "handlers": ["verbose_console"],
+            "level": "ERROR",
+            "propagate": False,
         },
     },
 }
@@ -95,12 +121,11 @@ if not structlog.is_configured():
         processors=[
             structlog.contextvars.merge_contextvars,
             structlog.stdlib.filter_by_level,
-            structlog.processors.TimeStamper(fmt='iso'),
+            structlog.processors.TimeStamper(fmt="iso"),
             structlog.stdlib.add_logger_name,
             structlog.stdlib.add_log_level,
             structlog.stdlib.PositionalArgumentsFormatter(),
             structlog.processors.StackInfoRenderer(),
-            structlog.processors.format_exc_info,
             structlog.processors.UnicodeDecoder(),
             structlog.processors.ExceptionPrettyPrinter(),
             structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
