@@ -6,6 +6,10 @@ set -o pipefail
 
 readonly cmd="$*"
 
+: "${REDIS_URL:=redis://redis:6379/0}"
+
+export CELERY_BROKER_URL="${REDIS_URL}"
+
 : "${DJANGO_DATABASE_HOST:=db}"
 : "${DJANGO_DATABASE_PORT:=5432}"
 

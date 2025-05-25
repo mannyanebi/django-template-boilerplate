@@ -1,5 +1,4 @@
 ---
-
 # Default compose file for development and production.
 # Should be used directly in development.
 # Automatically loads `docker-compose.override.yml` if it exists.
@@ -14,12 +13,17 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
     networks:
-      - postgres-net
+      - app-net
     env_file: ./config/.env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   web:
-    <<: &web
-      # Image name is changed in production:
+    <<: &web # Image name is changed in production:
       image: "affleego-backend:dev"
       build:
         target: development_build
@@ -35,10 +39,10 @@ services:
       volumes:
         - django-static:/var/www/affleego/django/static
       depends_on:
-        - db
+        db:
+          condition: service_healthy
       networks:
-        - web-net
-        - postgres-net
+        - app-net
       env_file: ./config/.env
       environment:
         DJANGO_DATABASE_HOST: db
@@ -51,16 +55,76 @@ services:
       retries: 5
       start_period: 30s
 
-# This task is an example of how to extend existing ones:
-#   some_worker:
-#     <<: *web
-#     command: python manage.py worker_process
+  # This task is an example of how to extend existing ones:
+  #   some_worker:
+  #     <<: *web
+  #     command: python manage.py worker_process
+
+  redis:
+    image: redis:6
+    restart: unless-stopped
+    networks:
+      - app-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  celeryworker:
+    <<: *web
+    image: affleego-backend-celeryworker:dev
+    command: /start-celeryworker
+    env_file: ./config/.env
+    networks:
+      - app-net
+    depends_on:
+      redis:
+        condition: service_healthy
+      web:
+        condition: service_healthy
+    environment:
+      DJANGO_DATABASE_HOST: db
+
+  celerybeat:
+    <<: *web
+    image: affleego-backend-celerybeat:dev
+    command: /start-celerybeat
+    env_file: ./config/.env
+    networks:
+      - app-net
+    depends_on:
+      redis:
+        condition: service_healthy
+      web:
+        condition: service_healthy
+    environment:
+      DJANGO_DATABASE_HOST: db
+
+  flower:
+    <<: *web
+    image: affleego-backend-flower:dev
+    command: /start-flower
+    env_file: ./config/.env
+    networks:
+      - app-net
+      - proxy-net
+    depends_on:
+      redis:
+        condition: service_healthy
+      web:
+        condition: service_healthy
+    environment:
+      DJANGO_DATABASE_HOST: db
+    ports:
+      - "5555:5555" # Expose Flower port directly
 
 networks:
-  # Network for postgres, use it for services that need access to the db:
-  postgres-net:
-  # Network for your internals, use it by default:
-  web-net:
+  # Main application network for all internal services
+  app-net:
+  # Optional network for external access if needed
+  proxy-net:
 
 volumes:
   postgres-data:

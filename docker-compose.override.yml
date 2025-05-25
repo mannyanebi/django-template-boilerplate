@@ -1,5 +1,4 @@
 ---
-
 # This file is required to bind ports in development,
 # since binding ports in regular compose file will ruin scaling
 # in production. Due to how `ports` directive is merged with two files.
@@ -22,3 +21,15 @@ services:
       args:
         - UID=${UID:-1000}
         - GID=${GID:-1000}
+
+  celeryworker:
+    volumes:
+      - .:/code
+
+  celerybeat:
+    volumes:
+      - .:/code
+
+  flower:
+    volumes:
+      - .:/code

@@ -23,21 +23,26 @@ services:
 
     command: bash ./docker/django/gunicorn.sh
     networks:
+      - app-net
       - proxy-net
 
   nginx:
     build:
       context: .
       dockerfile: ./docker/nginx/Dockerfile
-    restart: unless-stopped
+    restart: on-failure:5
     volumes:
       - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf # configuration
       - ./docker/nginx/ci.sh:/etc/ci.sh # test script
       - django-static:/var/www/affleego/django/static # serving django's statics
       - django-media:/var/www/affleego/django/media # serving django's media
     depends_on:
-      - web
+      web:
+        condition: service_healthy
+      flower:
+        condition: service_started
     networks:
+      - app-net
       - proxy-net
     ports:
       - "8081:80"
@@ -48,6 +53,63 @@ services:
 #     command: python manage.py worker_process
 #     deploy:
 #       replicas: 2
+
+  celeryworker:
+    <<: *web
+    image: affleego-backend-celeryworker:staging
+    command: /start-celeryworker
+    env_file: ./config/.env
+    networks:
+      - app-net
+    depends_on:
+      redis:
+        condition: service_healthy
+      web:
+        condition: service_healthy
+    environment:
+      DJANGO_DATABASE_HOST: db
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A server.settings.components.celery inspect ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  celerybeat:
+    <<: *web
+    image: affleego-backend-celerybeat:staging
+    command: /start-celerybeat
+    env_file: ./config/.env
+    networks:
+      - app-net
+    depends_on:
+      redis:
+        condition: service_healthy
+      web:
+        condition: service_healthy
+    environment:
+      DJANGO_DATABASE_HOST: db
+
+  flower:
+    <<: *web
+    image: affleego-backend-flower:staging
+    command: /start-flower
+    env_file: ./config/.env
+    networks:
+      - app-net
+      - proxy-net
+    depends_on:
+      redis:
+        condition: service_healthy
+      web:
+        condition: service_healthy
+    environment:
+      DJANGO_DATABASE_HOST: db
+      # Add this to pass the external URL path prefix to Flower
+      FLOWER_URL_PREFIX: flower
+    ports:
+      - "5555:5555" # Expose Flower port directly
+
 
 networks:
   # Network for your proxy server and application to connect them,

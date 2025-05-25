@@ -91,6 +91,19 @@ RUN chmod +x '/docker-entrypoint.sh' \
   # Replacing line separator CRLF with LF for Windows users:
   && sed -i 's/\r$//g' '/docker-entrypoint.sh'
 
+COPY ./docker/django/celery/worker/start /start-celeryworker
+RUN sed -i 's/\r$//g' /start-celeryworker
+RUN chmod +x /start-celeryworker
+
+COPY ./docker/django/celery/beat/start /start-celerybeat
+RUN sed -i 's/\r$//g' /start-celerybeat
+RUN chmod +x /start-celerybeat
+
+COPY ./docker/django/celery/flower/start /start-flower
+RUN sed -i 's/\r$//g' /start-flower
+RUN chmod +x /start-flower
+
+
 # Running as non-root user:
 USER web
 

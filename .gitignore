@@ -257,3 +257,11 @@ artifacts/
 
 # typings
 typings/
+
+
+# celery beat schedule file
+celerybeat-schedule
+
+# logs:
+logs.txt
+logs-*.txt
