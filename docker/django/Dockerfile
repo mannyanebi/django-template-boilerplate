@@ -74,6 +74,9 @@ RUN groupadd -g "${GID}" -r web \
 # Copy only requirements, to cache them in docker layer:
 COPY --chown=web:web ./poetry.lock ./pyproject.toml /code/
 
+# Create a directory for Django logs
+RUN mkdir -p /var/log/django && chown -R web:web /var/log/django
+
 # Project initialization:
 # hadolint ignore=SC2046
 RUN --mount=type=cache,target="$POETRY_CACHE_DIR" \

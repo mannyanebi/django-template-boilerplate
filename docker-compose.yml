@@ -38,6 +38,7 @@ services:
 
       volumes:
         - django-static:/var/www/affleego/django/static
+        - django-logs:/var/log/django
       depends_on:
         db:
           condition: service_healthy
