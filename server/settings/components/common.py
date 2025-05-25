@@ -418,4 +418,3 @@ CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 CELERY_WORKER_SEND_TASK_EVENTS = True
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html#std-setting-task_send_sent_event
 CELERY_TASK_SEND_SENT_EVENT = True
-Footer
