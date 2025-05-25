@@ -1,0 +1,86 @@
+version: "3"
+
+services:
+  loki:
+    image: grafana/loki:3.4.3
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - app-net
+    volumes:
+      - loki-data:/loki
+    # healthcheck:
+    #   test: ["CMD-SHELL", "wget -q --spider http://localhost:3100/ready || exit 1"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5
+
+  promtail:
+    image: grafana/promtail:3.5.0
+    volumes:
+      # - /var/log:/var/log
+      - ./docker/monitoring/promtail-config.yaml:/etc/promtail/config.yaml
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - django-logs:/var/log/django
+    command: -config.file=/etc/promtail/config.yaml
+    networks:
+      - app-net
+    depends_on:
+      - loki
+    # depends_on:
+    # loki:
+    #   condition: service_healthy
+
+  prometheus:
+    image: prom/prometheus:v3.4.0
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./docker/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    networks:
+      - app-net
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/etc/prometheus/console_libraries"
+      - "--web.console.templates=/etc/prometheus/consoles"
+    # healthcheck:
+    #   test: ["CMD-SHELL", "wget -q --spider http://localhost:9090/-/healthy || exit 1"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5
+
+  grafana:
+    image: grafana/grafana:12.0.0
+    ports:
+      - "3000:3000"
+    networks:
+      - app-net
+      - proxy-net
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./docker/monitoring/grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - prometheus
+      - loki
+    # depends_on:
+    #   prometheus:
+    #     condition: service_healthy
+    #   loki:
+    #     condition: service_healthy
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+
+networks:
+  app-net:
+  proxy-net:
+
+volumes:
+  loki-data:
+  prometheus-data:
+  grafana-data:

@@ -25,52 +25,54 @@ from server.apps.users import urls as users_urls
 
 admin.autodiscover()
 
-API_PREFIX = 'api'
-API_VERSION = 'v1'
+API_PREFIX = "api"
+API_VERSION = "v1"
 
 urlpatterns = [
     path(
-        f'{API_PREFIX}/{API_VERSION}/schema/',
+        f"{API_PREFIX}/{API_VERSION}/schema/",
         SpectacularAPIView.as_view(),
-        name='schema',
+        name="schema",
     ),
     path(
-        f'{API_PREFIX}/{API_VERSION}/docs/',
-        SpectacularSwaggerView.as_view(url_name='schema'),
-        name='swagger-ui',
+        f"{API_PREFIX}/{API_VERSION}/docs/",
+        SpectacularSwaggerView.as_view(url_name="schema"),
+        name="swagger-ui",
     ),
     path(
-        f'{API_PREFIX}/{API_VERSION}/redoc/',
-        SpectacularRedocView.as_view(url_name='schema'),
-        name='redoc',
+        f"{API_PREFIX}/{API_VERSION}/redoc/",
+        SpectacularRedocView.as_view(url_name="schema"),
+        name="redoc",
     ),
     # Apps:
     path(
-        f'{API_PREFIX}/{API_VERSION}/',
-        include(users_urls, namespace='users'),
+        f"{API_PREFIX}/{API_VERSION}/",
+        include(users_urls, namespace="users"),
     ),
     # Health checks:
-    path('health/', include(health_urls)),
+    path("health/", include(health_urls)),
     # django-admin:
-    path('admin/doc/', include(admindocs_urls)),
-    path('admin/', admin.site.urls),
+    path("admin/doc/", include(admindocs_urls)),
+    path("admin/", admin.site.urls),
+    # prometheus:
+    path("metrics/", include("django_prometheus.urls")),
     # Text and xml static files:
     path(
-        'robots.txt',
+        "robots.txt",
         TemplateView.as_view(
-            template_name='common/txt/robots.txt',
-            content_type='text/plain',
+            template_name="common/txt/robots.txt",
+            content_type="text/plain",
         ),
     ),
     path(
-        'humans.txt',
+        "humans.txt",
         TemplateView.as_view(
-            template_name='common/txt/humans.txt',
-            content_type='text/plain',
+            template_name="common/txt/humans.txt",
+            content_type="text/plain",
         ),
     ),
     # It is a good practice to have explicit index view:
-    path('', index, name='index'),
+    path("", index, name="index"),
 ]
 
 if settings.DEBUG:  # pragma: no cover
@@ -79,7 +81,7 @@ if settings.DEBUG:  # pragma: no cover
 
     urlpatterns = [
         # URLs specific only to django-debug-toolbar:
-        path('__debug__/', include(debug_toolbar.urls)),
+        path("__debug__/", include(debug_toolbar.urls)),
         *urlpatterns,
         # Serving media files in development only:
         *static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT),

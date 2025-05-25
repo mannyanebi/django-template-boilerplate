@@ -50,10 +50,13 @@ INSTALLED_APPS: tuple[str, ...] = (
     "drf_spectacular",
     # corsheaders
     "corsheaders",
-    "django_celery_beat",
+    # prometheus
+    "django_prometheus",
 )
 
 MIDDLEWARE: tuple[str, ...] = (
+    # prometheus
+    "django_prometheus.middleware.PrometheusBeforeMiddleware",
     # Logging:
     "server.settings.components.logging.LoggingContextVarsMiddleware",
     # Content Security Policy:
@@ -74,6 +77,8 @@ MIDDLEWARE: tuple[str, ...] = (
     "server.common.middleware.http.ErrorHandlingMiddleware",
     # Axes:
     "axes.middleware.AxesMiddleware",
+    # prometheus
+    "django_prometheus.middleware.PrometheusAfterMiddleware",
 )
 
 ROOT_URLCONF = "server.urls"
