@@ -1,0 +1,25 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  - job_name: "django"
+    metrics_path: "/metrics"
+    static_configs:
+      - targets: ["web:8000"]
+
+  - job_name: "celery"
+    static_configs:
+      - targets: ["celeryworker:8000"]
+
+  - job_name: "flower"
+    static_configs:
+      - targets: ["flower:5555"]
+
+  - job_name: "redis"
+    static_configs:
+      - targets: ["redis:6379"]

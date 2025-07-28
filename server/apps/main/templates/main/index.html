@@ -1,0 +1,39 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <title>Engine Sync API</title>
+    <meta name="description" content="Engine Sync - Connecting waste generators to waste collectors" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="{% static 'main/css/index.css' %}" />
+    <link rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href="{% static 'main/images/favicon-16x16.png' %}" />
+    <link rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href="{% static 'main/images/favicon-32x32.png' %}" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div class="container">
+      <div class="content">
+        <div class="text-section">
+          <h1>Engine Sync <span>API</span></h1>
+          <p>Backend system powering the connection between waste generators and collectors.</p>
+          <div class="status">
+            <div class="status-indicator"></div>
+            <p>System operational</p>
+          </div>
+        </div>
+        <div class="image-section">
+          <img src="{% static 'main/images/waste-connection.svg' %}" alt="Engine Sync" onerror="this.onerror=null; this.src='https://via.placeholder.com/500x400?text=Engine+Sync'">
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,7 @@
+#!/bin/bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+exec celery -A server.settings.components.celery beat -l INFO

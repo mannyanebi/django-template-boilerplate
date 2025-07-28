@@ -1,0 +1,19 @@
+"""Override any custom settings here."""
+
+# Uncomment this if you want to use mailhog as your email service
+# from server.settings.components import config
+# from server.settings.components.logging import LOGGING as LOGGING_BASE
+
+# Email
+# https://docs.djangoproject.com/en/4.2/topics/email/
+# -------------------------------------------------------------------------------
+#EMAIL_HOST = config("EMAIL_HOST", default="")
+#EMAIL_PORT = 1025
+#EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=False)
+
+
+# Logging
+# https://docs.djangoproject.com/en/4.2/topics/logging/
+
+# LOGGING = LOGGING_BASE.copy()
+# LOGGING["handlers"]["json_file"]["filename"] = "/var/log/django/app.log"

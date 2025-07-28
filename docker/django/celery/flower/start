@@ -1,0 +1,17 @@
+#!/bin/bash
+
+set -o errexit
+set -o nounset
+
+# Use URL prefix if defined
+URL_PREFIX_OPTION=""
+if [ -n "${FLOWER_URL_PREFIX:-}" ]; then
+  URL_PREFIX_OPTION="--url_prefix=${FLOWER_URL_PREFIX}"
+fi
+
+exec celery \
+  -A server.settings.components.celery \
+  -b "${CELERY_BROKER_URL}" \
+  flower \
+  $URL_PREFIX_OPTION \
+  --basic_auth="${CELERY_FLOWER_USER}:${CELERY_FLOWER_PASSWORD}"
