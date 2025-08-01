@@ -29,7 +29,7 @@ HOSTS: list[str] = config("ALLOWED_HOSTS", default="").split(",")  # type: ignor
 
 ALLOWED_HOSTS = [
     # Split the domains by comma and filter out empty strings
-    *[host.strip() for host in HOSTS.split(",") if host.strip()],  # type: ignore
+    *[host.strip() for host in HOSTS if host.strip()],  # type: ignore
     # We need this value for `healthcheck` to work:
     "localhost",
 ]

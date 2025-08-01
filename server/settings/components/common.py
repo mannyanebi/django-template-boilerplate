@@ -33,11 +33,8 @@ INSTALLED_APPS: tuple[str, ...] = (
     "django.contrib.admin",
     "django.contrib.admindocs",
     # Security:
-<<<<<<< HEAD
     # 'axes',
-=======
     "axes",
->>>>>>> origin/feature/celery-redis-setup
     # Health checks:
     # You may want to enable other checks as well,
     # see: https://github.com/KristianOellegaard/django-health-check
@@ -397,7 +394,7 @@ DEFAULT_FROM_EMAIL = config(
 
 # Timezone
 USE_TZ = True
-TIME_ZONE = 'Africa/Lagos'
+TIME_ZONE = "Africa/Lagos"
 # Celery
 # ------------------------------------------------------------------------------
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html#task-eager-propagates

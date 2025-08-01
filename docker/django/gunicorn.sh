@@ -23,7 +23,7 @@ export DJANGO_ENV
 # docs/pages/template/production-checklist.rst
 python /code/manage.py migrate --noinput
 python /code/manage.py collectstatic --noinput --clear
-python /code/manage.py compilemessages
+# python /code/manage.py compilemessages
 
 # Precompress static files with brotli and gzip.
 # The list of ignored file types was taken from https://github.com/evansd/whitenoise
@@ -37,4 +37,4 @@ find /var/www/affleego/django/static -type f \
 # Make sure it is in sync with `django/ci.sh` check:
 /usr/local/bin/gunicorn \
   --config python:docker.django.gunicorn_config \
-  server.wsgi
+  server.asgi

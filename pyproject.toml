@@ -6,7 +6,7 @@ authors = [
 name = "peddle-spark"
 description = "Peddlesoft Backend Spark Edition"
 version = "1.0.0"
-requires-python = ">3.12,<3.13"
+requires-python = ">3.13,<3.14"
 readme = "README.md"
 dynamic = ["dependencies", "classifiers"]
 
@@ -57,6 +57,7 @@ hiredis = "^3.1.1"
 flower = "^2.0.1"
 django-redis = "^5.4.0"
 django-prometheus = "^2.3.1"
+uvicorn = "^0.35.0"
 
 
 
@@ -128,7 +129,7 @@ pydocstyle.convention = "google"
 [tool.pyright]
 include = ["."]
 exclude = ["**/node_modules", "**/__pycache__", "**/.venv", "**/.git"]
-pythonVersion = "3.12"
+pythonVersion = "3.13"
 typeCheckingMode = "basic"
 reportMissingImports = "warning"
 reportMissingTypeStubs = "warning"
