@@ -52,12 +52,6 @@ class User(AbstractUser, UUIDMixin):
     class Meta:
         verbose_name = 'User'
         verbose_name_plural = 'Users'
-        constraints = [
-            models.CheckConstraint(
-                name='users_user_type_valid',
-                check=models.Q(type__in=['admin', 'user']),
-            ),
-        ]
 
     @override
     def __str__(self):
@@ -122,7 +116,7 @@ class VerificationCode(models.Model):
         verbose_name_plural = _('Verification Codes')
         constraints = [
             models.CheckConstraint(
-                check=models.Q(type__in=['verify_account', 'reset_password']),
+                condition=models.Q(type__in=['verify_account', 'reset_password']),
                 name='users_verificationcode_type_valid',
             ),
         ]

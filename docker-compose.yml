@@ -7,21 +7,6 @@
 # in production.
 
 services:
-  db:
-    image: "postgres:17-alpine"
-    restart: unless-stopped
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-    networks:
-      - app-net
-    env_file: ./config/.env
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-
   web:
     <<: &web # Image name is changed in production:
       image: "affleego-backend:dev"
@@ -39,14 +24,15 @@ services:
       volumes:
         - django-static:/var/www/affleego/django/static
         - django-logs:/var/log/django
-      depends_on:
-        db:
-          condition: service_healthy
       networks:
         - app-net
       env_file: ./config/.env
       environment:
-        DJANGO_DATABASE_HOST: db
+        # Update to point to host machine instead of container
+        DJANGO_DATABASE_HOST: host.docker.internal
+      # Add extra host mapping for Linux compatibility (optional but recommended)
+      extra_hosts:
+        - "host.docker.internal:host-gateway"
 
     command: python -We -bb manage.py runserver 0.0.0.0:8000
     healthcheck:
@@ -55,11 +41,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
-
-  # This task is an example of how to extend existing ones:
-  #   some_worker:
-  #     <<: *web
-  #     command: python manage.py worker_process
 
   redis:
     image: redis:6
@@ -86,7 +67,10 @@ services:
       web:
         condition: service_healthy
     environment:
-      DJANGO_DATABASE_HOST: db
+      DJANGO_DATABASE_HOST: host.docker.internal
+    # Add extra host mapping for Linux compatibility
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   celerybeat:
     <<: *web
@@ -101,7 +85,10 @@ services:
       web:
         condition: service_healthy
     environment:
-      DJANGO_DATABASE_HOST: db
+      DJANGO_DATABASE_HOST: host.docker.internal
+    # Add extra host mapping for Linux compatibility
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   flower:
     <<: *web
@@ -117,7 +104,10 @@ services:
       web:
         condition: service_healthy
     environment:
-      DJANGO_DATABASE_HOST: db
+      DJANGO_DATABASE_HOST: host.docker.internal
+    # Add extra host mapping for Linux compatibility
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - "5555:5555" # Expose Flower port directly
 
@@ -128,6 +118,5 @@ networks:
   proxy-net:
 
 volumes:
-  postgres-data:
   django-static:
   django-logs:
