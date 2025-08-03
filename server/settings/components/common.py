@@ -51,6 +51,7 @@ INSTALLED_APPS: tuple[str, ...] = (
     "drf_spectacular",
     # corsheaders
     "corsheaders",
+    "django_celery_beat",
     # prometheus
     "django_prometheus",
 )

@@ -9,7 +9,7 @@
 services:
   web:
     <<: &web # Image name is changed in production:
-      image: "affleego-backend:dev"
+      image: "peddlespark-backend:dev"
       build:
         target: development_build
         context: .
@@ -17,12 +17,12 @@ services:
         args:
           DJANGO_ENV: development
         cache_from:
-          - "affleego-backend:dev"
-          - "affleego-backend:latest"
+          - "peddlespark-backend:dev"
+          - "peddlespark-backend:latest"
           - "*"
 
       volumes:
-        - django-static:/var/www/affleego/django/static
+        - django-static:/var/www/peddlespark/django/static
         - django-logs:/var/log/django
       networks:
         - app-net
@@ -56,7 +56,7 @@ services:
 
   celeryworker:
     <<: *web
-    image: affleego-backend-celeryworker:dev
+    image: peddlespark-backend-celeryworker:dev
     command: /start-celeryworker
     env_file: ./config/.env
     networks:
@@ -74,7 +74,7 @@ services:
 
   celerybeat:
     <<: *web
-    image: affleego-backend-celerybeat:dev
+    image: peddlespark-backend-celerybeat:dev
     command: /start-celerybeat
     env_file: ./config/.env
     networks:
@@ -92,7 +92,7 @@ services:
 
   flower:
     <<: *web
-    image: affleego-backend-flower:dev
+    image: peddlespark-backend-flower:dev
     command: /start-flower
     env_file: ./config/.env
     networks:
